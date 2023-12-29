@@ -1,5 +1,6 @@
 package main.models;
 
+import main.enums.CellState;
 import main.enums.GameState;
 import main.strategies.WinningStrategy;
 
@@ -64,9 +65,28 @@ public class Game {
     }
     public void makemove()
     {
+
         Player player=Players.get(nextplayerindex);
        Cell cell= player.makemove(this.gameBoard);
-       moves.add(new Move(player,cell));
+       Move latestMove = new Move(player,cell);
+       moves.add(latestMove);
+
+       for(WinningStrategy w:winningStrategies){
+           if(w.checkWinner(latestMove,gameBoard)){
+               gamestate = GameState.WIN;
+           }
+       }
+
+       if(moves.size() == gameBoard.getSize()* gameBoard.getSize()){
+           gamestate = GameState.DRAW;
+       }
+
+
+
+       nextplayerindex++;
+       nextplayerindex = nextplayerindex%Players.size();
+
+
 
     }
 
@@ -82,6 +102,42 @@ public class Game {
         this.gamestate=GameState.INPROGRESS;
         this.gameBoard=new GameBoard(size);
         this.nextplayerindex=0;
+        moves = new ArrayList<>();
 
+    }
+
+    public void makeUndo() {
+
+        Move lastMove = getlastMove();
+        undoCellandStrategy(lastMove);
+        nextPlayerIndex();
+
+
+    }
+
+    public Move getlastMove(){
+        Move lastMove = moves.get(moves.size()-1);
+        moves.remove(lastMove);
+        return lastMove;
+    }
+
+    public void undoCellandStrategy(Move lastMove){
+        Cell cell = lastMove.getCell();
+
+        cell.setPlayer(null);
+        cell.setCellstate(CellState.EMPTY);
+
+        for(WinningStrategy w: winningStrategies){
+            w.undo(lastMove, gameBoard);
+        }
+    }
+
+    public void nextPlayerIndex(){
+        if(nextplayerindex == 0){
+            nextplayerindex = getPlayers().size()-1;
+        }
+        else{
+            nextplayerindex--;
+        }
     }
 }

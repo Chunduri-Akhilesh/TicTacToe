@@ -56,10 +56,25 @@ public class Player {
         int x=sc.nextInt();
         int y=sc.nextInt();
 
+        while(!validInput(x, y,  gameboard)){
+            System.out.println("Hi"+this.name+"Enter Input");
+             x=sc.nextInt();
+             y=sc.nextInt();
+        }
+
         Cell cell=gameboard.getCells().get(x).get(y);
         cell.setCellstate(CellState.FILLED);
         cell.setPlayer(this);
         return cell;
 
+    }
+    public boolean validInput(int x,int y, GameBoard gameBoard){
+        if(x> gameBoard.getSize()-1 || y>gameBoard.getSize()-1 || x<0 || y<0){
+            return false;
+        }
+        if(gameBoard.getCells().get(x).get(y).getCellstate().equals(CellState.FILLED)){
+            return false;
+        }
+        return true;
     }
 }

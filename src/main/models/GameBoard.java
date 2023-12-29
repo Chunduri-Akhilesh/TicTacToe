@@ -14,6 +14,14 @@ public class GameBoard {
         this.cells = cells;
     }
 
+    public int getSize() {
+        return size;
+    }
+
+    public void setSize(int size) {
+        this.size = size;
+    }
+
     public void print() {
         for(int i=0;i<size;i++)
         {
